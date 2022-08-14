@@ -94,7 +94,7 @@ contract EducationDAO is AccessControl {
     // Create a proposal
     function createProposal(string memory _name, string memory _data, uint256 _price) external onlyRole("MEMBER_ROLE"){
         require(hasRole(MEMBER_ROLE, msg.sender), "Caller is not a member!");
-        voteCount = 0;
+        uint256 voteCount = 0;
 
         proposals[nextProposalId] = TrainingProposal(
             nextProposalId,
@@ -116,7 +116,7 @@ contract EducationDAO is AccessControl {
 		require(block.timestamp < proposal.end, "Voting period has ended");
 		whoVoted[msg.sender][proposalId] = true;
         proposal.voteCount+=1;
-        if (proposal.voteCount >= minimumVotes){
+        if (proposal.voteCount == proposal.minimumVotes){
             createClass(proposal.name, proposal.instructor, 20, proposal.price);
         }
 	}
@@ -124,7 +124,7 @@ contract EducationDAO is AccessControl {
     // TODO
     function createClass(string className, address payable _instructor, uint256 _studentLimit, uint256 _price) internal {
         uint256 nextClassId = classCount+1;
-        classes[nextClassId] = Class storage({
+        classes[nextClassId] = Class({
             id: nextClassId,
             name: nextClassId,
             instructor: _instructor,
@@ -200,7 +200,7 @@ contract EducationDAO is AccessControl {
 
     // Withdraw from class. members are allowed to withdraw from a class as long as the class hasn't started. (For now)
     // TODO Refund policies
-    function withdrawFromClass(uint256 classId) external onlyRole("STUNDENT_ROLE"){
+    function withdrawFromClass(uint256 classId) external onlyRole("STUDENT_ROLE"){
         Class storage c = classes[classId];
         require(c.started == false, "This class has already started" );
         Member storage s = members[msg.sender];
