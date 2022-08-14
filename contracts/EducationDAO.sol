@@ -39,6 +39,7 @@ contract EducationDAO is AccessControl {
         uint256 currentNumberOfStudents;
         uint256 price;
         uint256 reviewScore;
+        uint256 numberOfReviews;
 
         
     }
@@ -166,7 +167,7 @@ contract EducationDAO is AccessControl {
         // If the user is already a student
         if(hasRole(STUDENT_ROLE, msg.sender)){
             // Check that the user is not already enrolled in the class
-            require(members[msg.sender].studentClasses[classId] == false, "You are already enrolled in this class");
+            require(isMemberEnrolledInClass(msg.sender, classId) == false, "You are already enrolled in this class");
             members[msg.sender].studentClasses[classId] = true;
             classBalances[classId] += msg.value;
             c.currentNumberOfStudents += 1;
@@ -193,7 +194,7 @@ contract EducationDAO is AccessControl {
         Class storage c = classes[classId];
         require(c.started == false, "This class has already started" );
         Member storage s = members[msg.sender];
-        require(s.studentClasses[classId] == true, "User is not enrolled in this class");
+        require(isMemberEnrolledInClass(msg.sender, classId) == true, "User is not enrolled in this class");
         // The following condition should never happen
         require(classBalances[classId] >= c.price, "Class does not have enough balance");
         s.studentClasses[classId] = false;
@@ -204,7 +205,12 @@ contract EducationDAO is AccessControl {
 
     // students rate the class
     function rateClass(uint256 classId, uint256 score) external onlyRole(STUDENT_ROLE) {
-        //TODO
+        require(isMemberEnrolledInClass(msg.sender, classId) == true, "User is not enrolled in this class");
+        Class c = classes[classId];
+        require(class.ended == true, "Class has not ended");
+
+
+
     }
 
     function setMemberFee(uint newMemberFee) external onlyRole(DEFAULT_ADMIN_ROLE){
@@ -235,7 +241,7 @@ contract EducationDAO is AccessControl {
 
     }
 
-    function isMemberEnrolledInClass(address _member, uint256 classId) external view returns (bool){
+    function isMemberEnrolledInClass(address _member, uint256 classId) public view returns (bool){
         
         return members[_member].studentClasses[classId];
     }
@@ -248,6 +254,11 @@ contract EducationDAO is AccessControl {
     function getClassBalance(uint256 _classId) external view returns (uint256){
         
         return classBalances[_classId];
+    }
+
+    function getStudentBalance(address _student) external view returns (uint256){
+        
+        return studentBalances[_student];
     }
 
     // Modifier to verify that msg sender is the instructor for the given class.
