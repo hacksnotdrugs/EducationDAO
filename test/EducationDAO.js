@@ -23,18 +23,18 @@ describe("EducationDAO Contract", () => {
 
   // User Joins
     describe("Testing joinDAO", () => {
-        it.skip("Should not allow user to join - value sent too low", async () => {
+        it("Should not allow user to join - value sent too low", async () => {
             let notEnough = MEMBER_FEE-1;
             await expect(DaoContract.connect(member1).joinDAO({value: notEnough})).to.be.revertedWith("Not enough ETH to join the DAO");
 
         });
-        it.skip("Should not allow user to join - user already a member", async () => {
+        it("Should not allow user to join - user already a member", async () => {
             
             await DaoContract.connect(member1).joinDAO({value: MEMBER_FEE});
             await expect(DaoContract.connect(member1).joinDAO({value: MEMBER_FEE})).to.be.revertedWith("Caller is already a member!");
 
         });
-        it.skip("Should allow user to join - one user", async () => {
+        it("Should allow user to join - one user", async () => {
             
             await DaoContract.connect(member1).joinDAO({value: MEMBER_FEE});
             let memberCountAfter = await DaoContract.memberCount();
@@ -44,7 +44,7 @@ describe("EducationDAO Contract", () => {
             expect(await DaoContract.hasRole(MEMBER_ROLE, member1.address)).to.be.eq(true);
 
         });
-        it.skip("Should allow user to join - Multiple users", async () => {
+        it("Should allow user to join - Multiple users", async () => {
             
             await DaoContract.connect(member1).joinDAO({value: MEMBER_FEE});
             let memberCountAfter1 = await DaoContract.memberCount();
@@ -62,23 +62,23 @@ describe("EducationDAO Contract", () => {
     });
     
     describe("Testing startClass", () => {
-        it.skip("Should create class", async () => {
+        it("Should create class", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 5, 15, 1000);
             expect(await DaoContract.classCount()).to.be.eq(1);
         });
         
-        it.skip("Should not allow user to start a Class - Not a MEMBER", async () => {
+        it("Should not allow user to start a Class - Not a MEMBER", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 5, 15, 1000);
             await expect(DaoContract.connect(member2).startClass(1)).to.be.revertedWith(`AccessControl: account ${member2.address.toLowerCase()} is missing role ${MEMBER_ROLE}`);
     
         });
-        it.skip("Should not allow user to start a Class - Not the class instructor", async () => {
+        it("Should not allow user to start a Class - Not the class instructor", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 5, 15, 1000);
             await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
             await expect(DaoContract.connect(member2).startClass(1)).to.be.revertedWith("Only the instructor can perform this activity");
 
         });
-        it.skip("Should not allow user to start a Class - Class has already started", async () => {
+        it("Should not allow user to start a Class - Class has already started", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 1, 15, 1000);
             await DaoContract.connect(instructor1).joinDAO({value: MEMBER_FEE});
             await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
@@ -87,7 +87,7 @@ describe("EducationDAO Contract", () => {
             await expect(DaoContract.connect(instructor1).startClass(1)).to.be.revertedWith("This class has already started");
 
         });
-        it.skip("Should not allow user to start a Class - Class has already ended", async () => {
+        it("Should not allow user to start a Class - Class has already ended", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 1, 15, 1000);
             await DaoContract.connect(instructor1).joinDAO({value: MEMBER_FEE});
             await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
@@ -97,14 +97,14 @@ describe("EducationDAO Contract", () => {
             await expect(DaoContract.connect(instructor1).startClass(1)).to.be.revertedWith("This class has already started");
 
         });
-        it.skip("Should not allow user to start a Class - Not enough students", async () => {
+        it("Should not allow user to start a Class - Not enough students", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 1, 15, 1000);
             await DaoContract.connect(instructor1).joinDAO({value: MEMBER_FEE});
             await expect(DaoContract.connect(instructor1).startClass(1)).to.be.revertedWith("Not enough students enrolled to start the class");
 
         });
 
-        it.skip("Should allow the instructor to start a Class ", async () => {
+        it("Should allow the instructor to start a Class ", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 3, 15, 1000);
             await DaoContract.connect(instructor1).joinDAO({value: MEMBER_FEE});
             await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
@@ -124,24 +124,24 @@ describe("EducationDAO Contract", () => {
     describe("Testing EndClass", () => {
     
         
-        it.skip("Should not allow user to end a Class - Not a MEMBER", async () => {
+        it("Should not allow user to end a Class - Not a MEMBER", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 5, 15, 1000);
             await expect(DaoContract.connect(member2).endClass(1)).to.be.revertedWith(`AccessControl: account ${member2.address.toLowerCase()} is missing role ${MEMBER_ROLE}`);
     
         });
-        it.skip("Should not allow user to end a Class - Not the class instructor", async () => {
+        it("Should not allow user to end a Class - Not the class instructor", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 5, 15, 1000);
             await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
             await expect(DaoContract.connect(member2).endClass(1)).to.be.revertedWith("Only the instructor can perform this activity");
 
         });
-        it.skip("Should not allow user to end a Class - Class has not started", async () => {
+        it("Should not allow user to end a Class - Class has not started", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 5, 15, 1000);
             await DaoContract.connect(instructor1).joinDAO({value: MEMBER_FEE});
             await expect(DaoContract.connect(instructor1).endClass(1)).to.be.revertedWith("This class has not started");
 
         });
-        it.skip("Should not allow user to end a Class - Class has already ended", async () => {
+        it("Should not allow user to end a Class - Class has already ended", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 1, 15, 1000);
             await DaoContract.connect(instructor1).joinDAO({value: MEMBER_FEE});
             await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
@@ -152,7 +152,7 @@ describe("EducationDAO Contract", () => {
 
         });
 
-        it.skip("Should allow the instructor to end a Class ", async () => {
+        it("Should allow the instructor to end a Class ", async () => {
             await DaoContract.createClass("Class 1", instructor1.address, 1, 15, 1000);
             await DaoContract.connect(instructor1).joinDAO({value: MEMBER_FEE});
             await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
@@ -174,34 +174,34 @@ describe("EducationDAO Contract", () => {
             await DaoContract.connect(member1).joinClass(1,{value:1000});
 
         });
-        it.skip("Should not allow user to join a Class - Not a MEMBER", async () => {
+        it("Should not allow user to join a Class - Not a MEMBER", async () => {
             
             await expect(DaoContract.connect(member3).joinClass(1)).to.be.revertedWith(`AccessControl: account ${member3.address.toLowerCase()} is missing role ${MEMBER_ROLE}`);
     
         });
-        it.skip("Should not allow user to join a Class - class already started", async () => {
+        it("Should not allow user to join a Class - class already started", async () => {
             await DaoContract.connect(instructor1).startClass(1);
             await expect(DaoContract.connect(member2).joinClass(1)).to.be.revertedWith("This class has already started");
     
         });
-        it.skip("Should not allow user to join a Class - Not enough ETH", async () => {
+        it("Should not allow user to join a Class - Not enough ETH", async () => {
             
             await expect(DaoContract.connect(member2).joinClass(1, {value: 999})).to.be.revertedWith("Not enough ETH to join this class");
     
         });
-        it.skip("Should not allow user to join a Class - Class is full", async () => {
+        it("Should not allow user to join a Class - Class is full", async () => {
             
             DaoContract.connect(member2).joinClass(1, {value: 1000});
             await DaoContract.connect(member3).joinDAO({value: MEMBER_FEE});
             await expect(DaoContract.connect(member3).joinClass(1, {value: 1000})).to.be.revertedWith("Class is full");
     
         });
-        it.skip("Should not allow user to join a Class - Already enrolled", async () => {
+        it("Should not allow user to join a Class - Already enrolled", async () => {
             
             await expect(DaoContract.connect(member1).joinClass(1, {value: 1000})).to.be.revertedWith("You are already enrolled in this class");
     
         });
-        it.skip("Should allow user to join a Class - member is not student", async () => {
+        it("Should allow user to join a Class - member is not student", async () => {
             
             await DaoContract.connect(member2).joinClass(1, {value: 1000});
             let classX =  await DaoContract.getClass(1);
@@ -212,7 +212,7 @@ describe("EducationDAO Contract", () => {
 
     
         });
-        it.skip("Should allow user to join a Class - member already a student", async () => {
+        it("Should allow user to join a Class - member already a student", async () => {
             await DaoContract.createClass("Class 2", instructor1.address, 1, 2, 1000);
             await DaoContract.connect(member1).joinClass(2, {value: 1000});
             let classX =  await DaoContract.getClass(2);
@@ -238,22 +238,22 @@ describe("EducationDAO Contract", () => {
             await DaoContract.connect(member2).joinClass(3,{value:1000});
 
         });
-        it.skip("Should not allow user to withdraw from a Class - Not a STUDENT", async () => {
+        it("Should not allow user to withdraw from a Class - Not a STUDENT", async () => {
             
             await expect(DaoContract.connect(member3).withdrawFromClass(1)).to.be.revertedWith(`AccessControl: account ${member3.address.toLowerCase()} is missing role ${STUDENT_ROLE}`);
     
         });
-        it.skip("Should not allow user to withdraw from a Class - Class has already started", async () => {
+        it("Should not allow user to withdraw from a Class - Class has already started", async () => {
             
             await expect(DaoContract.connect(member2).withdrawFromClass(2)).to.be.revertedWith("This class has already started");
     
         });
-        it.skip("Should not allow user to withdraw from a Class - Not enrolled in this class", async () => {
+        it("Should not allow user to withdraw from a Class - Not enrolled in this class", async () => {
             
             await expect(DaoContract.connect(member2).withdrawFromClass(1)).to.be.revertedWith("User is not enrolled in this class");
     
         });
-        it.skip("Should allow user to withdraw from a Class 1", async () => {
+        it("Should allow user to withdraw from a Class 1", async () => {
             
             await DaoContract.connect(member1).withdrawFromClass(1);
             expect(await DaoContract.isMemberEnrolledInClass(member1.address, 1)).to.eq(false);

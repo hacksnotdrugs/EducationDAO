@@ -27,7 +27,8 @@ contract EducationDAO is AccessControl {
 		uint256 voteCount;
 		uint256 end;
         uint256 price;
-        uint8 minimumVotes;
+        uint256 minimumVotes;
+        uint256 maxNumberOfStudents;
 		bool executed;
 	}
     // Represents a class. Created once the training proposal has been approved.
@@ -95,7 +96,7 @@ contract EducationDAO is AccessControl {
     }
 
     // Create a proposal
-    function createProposal(string memory _name, string memory _data, uint256 _price) external onlyRole(MEMBER_ROLE){
+    function createProposal(string memory _name, string memory _data, uint256 _price, uint256 _minNumberOfStudents, uint256 _maxNumberOfStudents) external onlyRole(MEMBER_ROLE){
         require(hasRole(MEMBER_ROLE, msg.sender), "Caller is not a member!");
         uint256 voteCount = 0;
 
@@ -106,7 +107,8 @@ contract EducationDAO is AccessControl {
             voteCount,
             block.timestamp + voteTime,
             _price,
-            2,
+            _minNumberOfStudents,
+            _maxNumberOfStudents,
             false
         );
         nextProposalId++;
@@ -119,12 +121,14 @@ contract EducationDAO is AccessControl {
 		whoVoted[msg.sender][proposalId] = true;
         proposal.voteCount+=1;
         if (proposal.voteCount == proposal.minimumVotes){
-            createClass(proposal.name, proposal.instructor, 20, proposal.price);
+        //  createClass(string memory className, address payable _instructor, uint256 _minNumberOfStudents, uint256 _maxNumberOfStudents, uint256 _price)
+            createClass(proposal.name, payable(proposal.instructor), proposal.minimumVotes, proposal.maxNumberOfStudents, proposal.price);
         }
 	}
 
     // TODO
-    function createClass(string memory className, address payable _instructor, uint256 _minNumberOfStudents, uint256 _maxNumberOfStudents, uint256 _price) external {
+    // Made this public for testing purposes but should be internal
+    function createClass(string memory className, address payable _instructor, uint256 _minNumberOfStudents, uint256 _maxNumberOfStudents, uint256 _price) public {
         
         uint256 nextClassId = classCount+1;
         classes[nextClassId] = Class ({
@@ -137,7 +141,8 @@ contract EducationDAO is AccessControl {
             maxNumberOfStudents: _maxNumberOfStudents,
             currentNumberOfStudents: 0,
             price: _price,
-            reviewScore: 0
+            reviewScore: 0,
+            numberOfReviews: 0
         });
         classCount = nextClassId;
     }
@@ -221,8 +226,8 @@ contract EducationDAO is AccessControl {
     // students rate the class
     function rateClass(uint256 classId, uint256 score) external onlyRole(STUDENT_ROLE) {
         require(isMemberEnrolledInClass(msg.sender, classId) == true, "User is not enrolled in this class");
-        Class c = classes[classId];
-        require(class.ended == true, "Class has not ended");
+        Class storage c = classes[classId];
+        require(c.ended == true, "Class has not ended");
         
 
 
