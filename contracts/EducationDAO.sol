@@ -23,8 +23,11 @@ contract EducationDAO is AccessControl {
     struct TrainingProposal{
 		uint256 id ;
 		string name;
-		uint256 votes;
+        address instructor;
+		uint256 voteCount;
 		uint256 end;
+        uint256 price;
+        uint8 minimumVotes;
 		bool executed;
 	}
     // Represents a class. Created once the training proposal has been approved.
@@ -52,7 +55,7 @@ contract EducationDAO is AccessControl {
     
 
     mapping(uint256 => TrainingProposal) public proposals;
-	mapping(address => mapping(uint256 => bool)) votes;
+	mapping(address => mapping(uint256 => bool)) whoVoted;
     mapping(uint256 => Class) public classes;
     // User becomes a student once they join their first class?
     mapping(address => Member) members;
@@ -66,16 +69,13 @@ contract EducationDAO is AccessControl {
     uint256 memberFee;
     uint256 public memberCount;
     uint256 public classCount;
-
+    uint public voteTime;
+    uint public nextProposalId;
 
 
     constructor(uint256 _memberFee){
         owner = msg.sender;
-        
         _setupRole(DEFAULT_ADMIN_ROLE, address(this));
-        //_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        
-        
         memberFee = _memberFee;
         memberCount = 0;
     }
@@ -95,23 +95,38 @@ contract EducationDAO is AccessControl {
     }
 
     // Create a proposal
-    function createProposal(string memory _name, string memory _data) external onlyRole("MEMBER_ROLE"){
-        //TODO
+    function createProposal(string memory _name, string memory _data, uint256 _price) external onlyRole(MEMBER_ROLE){
+        require(hasRole(MEMBER_ROLE, msg.sender), "Caller is not a member!");
+        uint256 voteCount = 0;
+
+        proposals[nextProposalId] = TrainingProposal(
+            nextProposalId,
+            _name,
+            msg.sender,
+            voteCount,
+            block.timestamp + voteTime,
+            _price,
+            2,
+            false
+        );
+        nextProposalId++;
     }
     //Vote on a proposal
     function vote(uint256 proposalId) external onlyRole(MEMBER_ROLE){
 		TrainingProposal storage proposal = proposals[proposalId];
-		require(votes[msg.sender][proposalId] == false, "User has already voted for this proposal");
+		require(whoVoted[msg.sender][proposalId] == false, "User has already voted for this proposal");
 		require(block.timestamp < proposal.end, "Voting period has ended");
-		votes[msg.sender][proposalId] = true;
-        // TODO
+		whoVoted[msg.sender][proposalId] = true;
+        proposal.voteCount+=1;
+        if (proposal.voteCount == proposal.minimumVotes){
+            createClass(proposal.name, proposal.instructor, 20, proposal.price);
+        }
 	}
 
     // TODO
     function createClass(string memory className, address payable _instructor, uint256 _minNumberOfStudents, uint256 _maxNumberOfStudents, uint256 _price) external {
         
         uint256 nextClassId = classCount+1;
-        //Class storage c = 
         classes[nextClassId] = Class ({
             id: nextClassId,
             name: className,
@@ -208,7 +223,7 @@ contract EducationDAO is AccessControl {
         require(isMemberEnrolledInClass(msg.sender, classId) == true, "User is not enrolled in this class");
         Class c = classes[classId];
         require(class.ended == true, "Class has not ended");
-
+        
 
 
     }
