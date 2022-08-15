@@ -74,8 +74,8 @@ contract EducationDAO is AccessControl, PullPayment {
     uint256 memberFee;
     uint256 public memberCount;
     uint256 public classCount;
+    uint256 public nextProposalId;
     uint public voteTime;
-    uint public nextProposalId;
 
 
     constructor(uint256 _memberFee){
@@ -83,6 +83,7 @@ contract EducationDAO is AccessControl, PullPayment {
         _setupRole(DEFAULT_ADMIN_ROLE, address(this));
         memberFee = _memberFee;
         memberCount = 0;
+        voteTime = 3600;
     }
 
     
@@ -305,6 +306,10 @@ contract EducationDAO is AccessControl, PullPayment {
     function getStudentBalance(address _student) external view returns (uint256){
         
         return studentBalances[_student];
+    }
+
+    function didThisAddressVote(address _address, uint _proposalId) public view returns (bool) {
+        return whoVoted[_address][_proposalId];
     }
 
     // Modifier to verify that msg sender is the instructor for the given class.
