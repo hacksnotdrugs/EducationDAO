@@ -42,8 +42,9 @@ contract EducationDAO is AccessControl {
         uint256 maxNumberOfStudents;
         uint256 currentNumberOfStudents;
         uint256 price;
-        uint256 reviewScore;
+        uint256 reviewScore; // score from 1 to 5
         uint256 numberOfReviews;
+        
 
         
     }
@@ -64,6 +65,7 @@ contract EducationDAO is AccessControl {
     mapping(uint256 => uint256) classBalances;
     // Holds the balance for each student. In case they withdraw from their classes.
     mapping(address => uint256) studentBalances;
+    mapping(address => mapping(uint256 => bool)) public classReviews;
 
     address owner;
     uint256 quorum;
@@ -121,13 +123,12 @@ contract EducationDAO is AccessControl {
 		whoVoted[msg.sender][proposalId] = true;
         proposal.voteCount+=1;
         if (proposal.voteCount == proposal.minimumVotes){
-        //  createClass(string memory className, address payable _instructor, uint256 _minNumberOfStudents, uint256 _maxNumberOfStudents, uint256 _price)
             createClass(proposal.name, payable(proposal.instructor), proposal.minimumVotes, proposal.maxNumberOfStudents, proposal.price);
         }
 	}
 
     // TODO
-    // Made this public for testing purposes but should be internal
+    // I made this public for testing purposes. But it should be internal
     function createClass(string memory className, address payable _instructor, uint256 _minNumberOfStudents, uint256 _maxNumberOfStudents, uint256 _price) public {
         
         uint256 nextClassId = classCount+1;
@@ -224,12 +225,24 @@ contract EducationDAO is AccessControl {
     }
 
     // students rate the class
-    function rateClass(uint256 classId, uint256 score) external onlyRole(STUDENT_ROLE) {
+    function rateClass(uint256 classId, uint256 _score) external onlyRole(STUDENT_ROLE) {
+        require(_score >= 1 && _score <= 5, "Score must be between 1 and 5");
         require(isMemberEnrolledInClass(msg.sender, classId) == true, "User is not enrolled in this class");
         Class storage c = classes[classId];
         require(c.ended == true, "Class has not ended");
-        
+        require(classReviews[msg.sender][classId] == false, "Caller has rated this class before");
+        require(c.numberOfReviews + 1 <= c.currentNumberOfStudents, "All students have rated the class");
 
+        uint256 oldScore = c.reviewScore;
+        uint256 numOfReviews = c.numberOfReviews;
+        uint256 weight = 100/(numOfReviews+1);
+        uint256 old = (oldScore * (100-weight));
+        uint256 newer = (_score * weight);
+        uint256 newScore =  (old + newer)/100;
+        c.numberOfReviews += 1;
+        c.reviewScore = newScore;
+        classReviews[msg.sender][classId]=true;
+        
 
     }
 

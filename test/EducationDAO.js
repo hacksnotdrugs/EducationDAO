@@ -7,6 +7,7 @@ describe("EducationDAO Contract", () => {
     let admin, member1, member2, member3, instructor1;
     const MEMBER_FEE = 1000;
     let MEMBER_ROLE, INSTRUCTOR_ROLE, STUDENT_ROLE, DEFAULT_ADMIN_ROLE = "";
+    
     beforeEach(async () => {
       Dao = await ethers.getContractFactory("EducationDAO");
       [admin, member1, member2, member3, instructor1] = await ethers.getSigners();
@@ -294,6 +295,92 @@ describe("EducationDAO Contract", () => {
 
         
         
+    });
+
+    describe("Testing rateClass", () => {
+    
+        beforeEach(async () => {
+            await DaoContract.createClass("Class 1", instructor1.address, 1, 3, 1000);
+            await DaoContract.createClass("Class 2", instructor1.address, 1, 2, 1000);
+            await DaoContract.createClass("Class 2", instructor1.address, 1, 2, 1000);
+            await DaoContract.connect(instructor1).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(admin).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member1).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member3).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member1).joinClass(1,{value:1000});
+            await DaoContract.connect(member2).joinClass(1,{value:1000});
+            await DaoContract.connect(member3).joinClass(1,{value:1000});
+            await DaoContract.connect(instructor1).startClass(1);
+            await DaoContract.connect(member2).joinClass(2,{value:1000});
+            await DaoContract.connect(member3).joinClass(2,{value:1000});
+            await DaoContract.connect(member3).joinClass(3,{value:1000});
+            await DaoContract.connect(instructor1).startClass(2);
+            
+            
+        });
+        it("Should not allow user to rate a Class - Not a STUDENT", async () => {
+            
+            await expect( DaoContract.rateClass(1, 4)).to.be.revertedWith(`AccessControl: account ${admin.address.toLowerCase()} is missing role ${STUDENT_ROLE}`);
+    
+        });
+        it("Should not allow user to rate a Class - Incorrect score", async () => {
+            
+            await expect( DaoContract.connect(member3).rateClass(1, 6)).to.be.revertedWith("Score must be between 1 and 5");
+    
+        });
+        it("Should not allow user to rate a Class - Caller is not enrolled in the class", async () => {
+            
+            await expect( DaoContract.connect(member2).rateClass(3, 3)).to.be.revertedWith("User is not enrolled in this class");
+    
+        });
+        it("Should not allow user to rate a Class - Class has not ended", async () => {
+            
+            await expect( DaoContract.connect(member3).rateClass(1, 3)).to.be.revertedWith("Class has not ended");
+    
+        });
+        it("Should not allow user to rate a Class - Caller has rated this class before", async () => {
+            await DaoContract.connect(instructor1).endClass(1);
+            await DaoContract.connect(member3).rateClass(1, 3);
+            await expect( DaoContract.connect(member3).rateClass(1, 3)).to.be.revertedWith("Caller has rated this class before");
+    
+        });
+        it("Should allow user to rate a Class 1", async () => {
+            await DaoContract.connect(instructor1).endClass(1);
+            await DaoContract.connect(member3).rateClass(1, 3);
+            let classX =  await DaoContract.getClass(1);
+            expect(classX.numberOfReviews).to.be.eq(ethers.BigNumber.from(1));
+            let userReview = await DaoContract.classReviews(member3.address, 1);
+            expect (userReview).to.be.eq(true);
+            expect(classX.reviewScore).to.be.eq(ethers.BigNumber.from(3));
+
+        });
+
+        it("Should allow user to rate a Class 2", async () => {
+            await DaoContract.connect(instructor1).endClass(1);
+            await DaoContract.connect(instructor1).endClass(2);
+            await DaoContract.connect(member3).rateClass(1, 3);
+            await DaoContract.connect(member2).rateClass(1, 4);
+            await DaoContract.connect(member1).rateClass(1, 4);
+            let classX =  await DaoContract.getClass(1);
+            expect(classX.numberOfReviews).to.be.eq(ethers.BigNumber.from(3));
+            expect(classX.reviewScore).to.be.eq(ethers.BigNumber.from(3));
+            let reviews3 = await DaoContract.classReviews(member3.address, 1);
+            expect (reviews3).to.be.eq(true);
+            let reviews2 = await DaoContract.classReviews(member2.address, 1);
+            expect (reviews2).to.be.eq(true);
+
+            await DaoContract.connect(member3).rateClass(2, 2);
+            await DaoContract.connect(member2).rateClass(2, 3);
+            let class2 =  await DaoContract.getClass(2);
+            expect(class2.numberOfReviews).to.be.eq(ethers.BigNumber.from(2));
+            expect(class2.reviewScore).to.be.eq(ethers.BigNumber.from(2));
+            let reviews3_2 = await DaoContract.classReviews(member3.address, 2);
+            expect (reviews3_2).to.be.eq(true);
+            let reviews2_2 = await DaoContract.classReviews(member2.address, 2);
+            expect (reviews2_2).to.be.eq(true);
+
+        });
     });
 
 
