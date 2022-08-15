@@ -74,6 +74,34 @@ describe("EducationDAO Contract", () => {
             await expect(DaoContract.connect(member2).createProposal("Proposal 1", "", 100, 5, 15)).to.be.revertedWith(`AccessControl: account ${member2.address.toLowerCase()} is missing role ${MEMBER_ROLE}`);
         });
     });
+
+    // Vote
+    describe("Testing vote function", () => {
+        it("Should allow a vote - MEMBER", async () => {
+            await DaoContract.connect(member1).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member1).createProposal("Proposal 1", "", 100, 5, 15); 
+            await DaoContract.connect(member2).vote(0); 
+            expect(await DaoContract.didThisAddressVote(member2.address, 0)).to.be.eq(true);
+        });
+
+        it("Should not allow a second vote - MEMBER", async () => {
+            await DaoContract.connect(member1).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member1).createProposal("Proposal 1", "", 100, 5, 15); 
+            await DaoContract.connect(member2).vote(0); 
+            await expect(DaoContract.connect(member2).vote(0)).to.be.revertedWith(`User has already voted for this proposal`);
+        });
+
+        it("Should not allow a vote after voteTime exceeded", async () => {
+            await DaoContract.connect(member1).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member1).createProposal("Proposal 1", "", 100, 5, 15); 
+            await ethers.provider.send("evm_increaseTime", [3601])
+            await expect(DaoContract.connect(member2).vote(0)).to.be.revertedWith(`Voting period has ended`); 
+        });
+    });
+
     
     describe("Testing startClass", () => {
         it("Should create class", async () => {

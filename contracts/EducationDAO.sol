@@ -81,6 +81,7 @@ contract EducationDAO is AccessControl {
         _setupRole(DEFAULT_ADMIN_ROLE, address(this));
         memberFee = _memberFee;
         memberCount = 0;
+        voteTime = 3600;
     }
 
     
@@ -292,6 +293,10 @@ contract EducationDAO is AccessControl {
     function getStudentBalance(address _student) external view returns (uint256){
         
         return studentBalances[_student];
+    }
+
+    function didThisAddressVote(address _address, uint _proposalId) public view returns (bool) {
+        return whoVoted[_address][_proposalId];
     }
 
     // Modifier to verify that msg sender is the instructor for the given class.
