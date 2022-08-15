@@ -72,8 +72,8 @@ contract EducationDAO is AccessControl {
     uint256 memberFee;
     uint256 public memberCount;
     uint256 public classCount;
+    uint256 public nextProposalId;
     uint public voteTime;
-    uint public nextProposalId;
 
 
     constructor(uint256 _memberFee){

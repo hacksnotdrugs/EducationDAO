@@ -61,6 +61,19 @@ describe("EducationDAO Contract", () => {
 
         });
     });
+
+    // Create proposal
+    describe("Testing createProposal", () => {
+        it("Should create a proposal", async () => {
+            await DaoContract.connect(member1).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member1).createProposal("Proposal 1", "", 100, 5, 15);
+            expect(await DaoContract.nextProposalId()).to.be.eq(1);
+        });
+
+        it("Should not allow user to create proposal- Not a MEMBER", async () => {          
+            await expect(DaoContract.connect(member2).createProposal("Proposal 1", "", 100, 5, 15)).to.be.revertedWith(`AccessControl: account ${member2.address.toLowerCase()} is missing role ${MEMBER_ROLE}`);
+        });
+    });
     
     describe("Testing startClass", () => {
         it("Should create class", async () => {
