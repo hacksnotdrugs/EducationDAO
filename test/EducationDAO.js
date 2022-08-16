@@ -101,6 +101,21 @@ describe("EducationDAO Contract", () => {
         });
     });
 
+    // Create Class
+    describe("Testing createClass", () => {
+        it("Should create a class - MEMBER", async () => {
+            await DaoContract.connect(member1).joinDAO({value: MEMBER_FEE});
+            await DaoContract.connect(member2).joinDAO({value: MEMBER_FEE});
+            //1. create a proposal, 
+            await DaoContract.connect(member1).createProposal("Proposal 1", "", 100, 1, 15); 
+
+            //2. vote for that proposal until it gets approved and 
+            await DaoContract.connect(member2).vote(0); 
+            
+            //3.  check that the class is added correctly.
+            expect(await DaoContract.classCount()).to.be.eq(1);
+        });
+    });
     
     describe("Testing startClass", () => {
         it("Should create class", async () => {
