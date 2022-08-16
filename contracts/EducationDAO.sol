@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 // Import this file to use console.log
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/security/PullPayment.sol";
+//import "@openzeppelin/contracts/security/PullPayment.sol";
 
 // Users can propose trainings
 // Users vote on the trainings they would like to take. TBD: Donation amount 
@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/security/PullPayment.sol";
 // Once a user signs up for a class, they become a student
 // THe instructor can start and finish a class. Once it has finished
 
-contract EducationDAO is AccessControl, PullPayment {
+contract EducationDAO is AccessControl  {
     
 
     // Create a new role identifier for the minter role
@@ -260,27 +260,30 @@ contract EducationDAO is AccessControl, PullPayment {
 
     // members get their refunds
     function getRefund() external onlyRole(STUDENT_ROLE){
+        uint256 currentBalance = studentBalances[msg.sender];
+        require(currentBalance > 0, "Student has no balance");
+        studentBalances[msg.sender] = 0;
+        (bool success, ) = msg.sender.call{value: currentBalance}("");
+        require(success, "GetRefund: unable to send value, recipient may have reverted");
         //TODO
     }
     //  Instructor calls the getPaid method once the class has ended. The instructor triggers the transfer
     // A student will only get an NFT after submitting 1-5 star rating, and - the instructor is only paid if at least X number of members submit their rating
     // That way the student and the instructor is protected.
     function getPaid(uint256 classId) external onlyRole(INSTRUCTOR_ROLE) verifyInstructor(classId) {
-        // Check that msg.sender is the instructor for the given class
-        // Check that class has ended
-        // Check that class has a balance
-        // Check that at least half of the students have rated the class
-        
         Class storage c = classes[classId];
+        // Check that class has ended
         require(c.ended == true, "Class has not ended");
+        // Check that class has a balance
         require(classBalances[classId]>0, "Class has no balance");
+        // Check that at least half of the students have rated the class
         require(c.numberOfReviews >= (c.currentNumberOfStudents/2), "Not enough students have rated the class");
         uint256 balance = classBalances[classId];
         classBalances[classId] = 0;
-        _asyncTransfer(msg.sender, balance);
-        // (bool success, ) = msg.sender.call{value: amount}("");
-        // require(success, "Address: unable to send value, recipient may have reverted");
-        //TODO
+        //_asyncTransfer(msg.sender, balance);
+        (bool success, ) = c.instructor.call{value: balance}("");
+        require(success, "getPaid: unable to send value, recipient may have reverted");
+        
     }
 
     function getClassesForStudent(address _member) external view returns (Class[] memory){
