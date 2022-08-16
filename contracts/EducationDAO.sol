@@ -68,6 +68,7 @@ contract EducationDAO is AccessControl  {
     // Holds the balance for each student. In case they withdraw from their classes.
     mapping(address => uint256) studentBalances;
     mapping(address => mapping(uint256 => bool)) public classReviews;
+    mapping(address => uint256[]) studentClassList;
 
     address owner;
     uint256 quorum;
@@ -193,6 +194,7 @@ contract EducationDAO is AccessControl  {
             // Check that the user is not already enrolled in the class
             require(isMemberEnrolledInClass(msg.sender, classId) == false, "You are already enrolled in this class");
             members[msg.sender].studentClasses[classId] = true;
+            studentClassList[msg.sender].push(classId);
             classBalances[classId] += msg.value;
             c.currentNumberOfStudents += 1;
         }
@@ -287,8 +289,12 @@ contract EducationDAO is AccessControl  {
     }
 
     function getClassesForStudent(address _member) external view returns (Class[] memory){
-        //TODO
 
+        Class[] memory studentClasses = new Class[](studentClassList[_member].length);
+        for(uint i = 0; i < studentClassList[_member].length; i++) {
+            studentClasses[i] = getClass(studentClassList[_member][i]);
+        }
+        return studentClasses;
     }
 
     function isMemberEnrolledInClass(address _member, uint256 classId) public view returns (bool){
@@ -296,10 +302,29 @@ contract EducationDAO is AccessControl  {
         return members[_member].studentClasses[classId];
     }
 
-    function getClass(uint256 _classId) external view returns (Class memory){
+    function getClass(uint256 _classId) public view returns (Class memory){
         
         return classes[_classId];
     }
+
+    function getAllClasses() external view returns (Class[] memory){
+
+        Class[] memory allClasses = new Class[](classCount);
+        for(uint i = 0; i < classCount; i++) {
+            allClasses[i] = classes[i+1];
+        }
+        return allClasses;
+    }
+
+    function getAllProposals() external view returns (TrainingProposal[] memory) {
+
+        TrainingProposal[] memory allProposals = new TrainingProposal[](nextProposalId);
+        for(uint i = 0; i < nextProposalId; i++) {
+            allProposals[i] = proposals[i];
+        } 
+        return allProposals;
+    }
+
     // TODO for testing only. delete later
     function getClassBalance(uint256 _classId) external view returns (uint256){
         
