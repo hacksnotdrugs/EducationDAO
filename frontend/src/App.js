@@ -1,4 +1,26 @@
 import './App.css';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import "@rainbow-me/rainbowkit/styles.css";
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
+
+const { chains, provider } = configureChains(
+  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
+  [alchemyProvider({ alchemyId: process.env.ALCHEMY_ID }), publicProvider()]
+);
+
+const { connectors } = getDefaultWallets({
+  appName: "My RainbowKit App",
+  chains
+});
+
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors,
+  provider
+});
 
 function App() {
   return (
@@ -17,7 +39,13 @@ function App() {
               <li>NFTs</li>
             </ul>
           </span>
-          <span className='flex-1 bg-gray-800 hover:bg-blue-700 text-white font-bold px-4 rounded mx-2 align-baseline'>Connect Wallet</span>
+          <span>
+            <WagmiConfig client={wagmiClient}>
+              <RainbowKitProvider chains={chains}>
+                <YourComponent />
+              </RainbowKitProvider>
+            </WagmiConfig>
+          </span>
         </nav>
       </header>
         <main className='bg-slate-200 py-11 mb-7'>
@@ -38,5 +66,16 @@ function App() {
     </div>
   );
 }
+
+const YourComponent = () => {
+  return (
+    <div
+      style={{
+      }}
+    >
+      <ConnectButton />
+    </div>
+  );
+};
 
 export default App;
