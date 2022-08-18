@@ -340,6 +340,14 @@ contract EducationDAO is AccessControl  {
         return whoVoted[_address][_proposalId];
     }
 
+    fallback() external payable {
+        console.log("----- fallback:", msg.value);
+    }
+
+    receive() external payable {
+        console.log("----- receive:", msg.value);
+    }
+
     // Modifier to verify that msg sender is the instructor for the given class.
     modifier verifyInstructor(uint256 classId){
         Class storage c = classes[classId];

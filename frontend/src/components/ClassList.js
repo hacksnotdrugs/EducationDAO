@@ -71,7 +71,6 @@ const ClassList = ({ blockchain, signer }) => {
   useEffect(() => {
     (async () => {
       blockchain.daoContract && setClasses(await blockchain.daoContract.getAllClasses());
-      
     })();
   }, [blockchain]);
 
@@ -84,13 +83,15 @@ const ClassList = ({ blockchain, signer }) => {
           <Col>
               <h3>All Classes: {classes.length}</h3>
             
-              <table className={`table table-striped trade-list mb-0 ${className}`}>
-              <thead>
-                <tr>
+              <table className={`py-4 mt-5 mx-auto table-striped trade-list ${className}`}>
+                <thead>
+                  <tr>
                     <th>Name</th>
                     <th>Instructor</th>
                     <th>Price</th>
                     <th>Link</th>
+                    <th></th>
+                    <th>Start</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -114,16 +115,20 @@ const ClassList = ({ blockchain, signer }) => {
                       </td>
                       <td>
                           <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinClass(e, theClass.id, theClass.price)}>Join</Button>
-                          
-                         
                       </td>
+                        <td>
+                        {  (window.ethereum.selectedAddress == theClass.instructor.toLowerCase()) ?
+                          <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinClass(e, theClass.id, theClass.price)}>Start Class</Button>
+                          : "" 
+                          }
+                        </td> 
                     </tr>
                 ))}
                 </tbody>
               </table>
             </Col>
         </div>
-        <div className="col-sm-4">
+        <div className="col-sm-4 mb-5">
           <Col>
             <Form className="form" onSubmit={createClass}>
               <Row>
@@ -138,7 +143,7 @@ const ClassList = ({ blockchain, signer }) => {
                   />
                 </Form.Group>
                 </Col>
-                <Col>
+                <Col className="mb-5">
                   <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" type="submit">
                     Submit
                   </Button>

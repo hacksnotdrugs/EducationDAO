@@ -49,9 +49,9 @@ const UserClassList = ({ blockchain, signer }) => {
         <div className="row">
         <div className="col-sm-4 first-col">
           <Col>
-              <h3>Your Classes: {userClasses.length}</h3>
+              <h3>Classes you have joined: {userClasses.length}</h3>
             
-              <table className={`table table-striped trade-list mb-0 ${className}`}>
+              <table className={` mt-6 table table-striped trade-list mx-auto ${className}`}>
               <thead>
                 <tr>
                     <th>Name</th>

@@ -14,7 +14,7 @@ import UserClassList from "./components/UserClassList";
 import ClassDetail from "./components/ClassDetail";
 
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
+  [chain.localhost, chain.goerli],
   [alchemyProvider({ alchemyId: process.env.ALCHEMY_ID }), publicProvider()]
 );
 
@@ -58,7 +58,7 @@ function App() {
               <li><a href="/">Home</a></li>
               <li><a href="/class/all">Classes</a></li>
               <li>Create</li>
-              <li>NFTs</li>
+              <li>NFTs (Coming Soon!)</li>
             </ul>
           </span>
           <span>
@@ -95,7 +95,7 @@ function App() {
         </section>
         
 
-      <footer className='bg-gray-600 fixed bottom-0 left-0 w-full flex justify-center items-center text-gray-50 py-8'>FOOTER</footer>
+      <footer className='text-2xl font-semibold bg-gray-600 fixed bottom-0 left-0 w-full flex justify-center items-center text-gray-50 py-8'>EducationDAO</footer>
       </body>
     </div>
   );

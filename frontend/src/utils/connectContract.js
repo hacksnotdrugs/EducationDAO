@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 
 async function connectContract() {
   //Note: Your contractAddress will start with 0x, delete everything between the quotes and paste your contract address.
-  const contractAddress = "0xa3f4e9fe3221c16c9fd9aad84a3ab082543e2e61";
+  const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
   const contractABI = abiJSON.abi;
   let EduDAOContract;
   try {
