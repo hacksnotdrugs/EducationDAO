@@ -95,7 +95,7 @@ function App() {
         </section>
         
 
-        <footer className='text-2xl font-semibold bg-gray-600 fixed bottom-0 left-0 w-full flex justify-center items-center text-gray-50 py-8'>EducationDAO</footer>
+      <footer className='text-2xl font-semibold bg-gray-600 fixed bottom-0 left-0 w-full flex justify-center items-center text-gray-50 py-8'>EducationDAO</footer>
       </body>
     </div>
   );
