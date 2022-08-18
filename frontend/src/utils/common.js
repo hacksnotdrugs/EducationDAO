@@ -25,6 +25,15 @@ const getBlockchain = () =>
     });
   });
 
+  
+
+  const isUserAMember = async (blockchain, role, signerAddress) => {
+      
+    const kROLE = ethers.utils.keccak256(role);
+    let isMember = await blockchain.daoContract.hasRole(kROLE, signerAddress);
+    return isMember;
+  }
+
 // function showError(error) {
 //   Swal.fire({
 //     icon: "error",
@@ -35,5 +44,5 @@ const getBlockchain = () =>
 
 
 
-export { getBlockchain };
+export { getBlockchain, isUserAMember };
 export default getBlockchain;
