@@ -72,7 +72,7 @@ contract EducationDAO is AccessControl  {
 
     address owner;
     uint256 quorum;
-    uint256 memberFee;
+    uint256 public memberFee;
     uint256 public memberCount;
     uint256 public classCount;
     uint256 public nextProposalId;

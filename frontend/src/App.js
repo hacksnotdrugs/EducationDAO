@@ -1,10 +1,17 @@
 import './App.css';
+import { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { getBlockchain } from "./utils/common";
+import JoinDAO from "./components/joinDAO";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ClassList from "./components/ClassList";
+import UserClassList from "./components/UserClassList";
+import ClassDetail from "./components/ClassDetail";
 
 const { chains, provider } = configureChains(
   [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
@@ -23,6 +30,18 @@ const wagmiClient = createClient({
 });
 
 function App() {
+
+  
+  const [blockchain, setBlockchain] = useState({});
+  
+
+  useEffect(() => {
+    (async () => {
+      setBlockchain(await getBlockchain()); // && setNextProposalId(await blockchain.daoContract.nextProposalId());
+    })();
+  }, []);
+    
+
   return (
     <div className="App flex flex-col">
       <body>
@@ -30,11 +49,14 @@ function App() {
       <header className="App-header w-full">
         {/* Navigation */}
         <nav className='flex py-6 bg-slate-500 text-slate-50'>
-          <span className='flex-1'>LOGO</span>
+          {/* <span className='flex-1'>LOGO</span> */}
+          <span className='flex-2'>
+            <JoinDAO blockchain={blockchain}/>
+          </span>
           <span className='flex-1'>
             <ul className='inline-flex gap-24'>
-              <li>Home</li>
-              <li>Classes</li>
+              <li><a href="/">Home</a></li>
+              <li><a href="/class/all">Classes</a></li>
               <li>Create</li>
               <li>NFTs</li>
             </ul>
@@ -57,9 +79,21 @@ function App() {
         </main>
         <section>
           <span className='border-solid border-black bg-slate-300 py-11 px-11 m-1'>My Upcoming Classes</span>
-          <span className='border-solid border-black bg-slate-300 py-11 px-11 m-1'>My Completed Classes</span>
-          <span className='border-solid border-black bg-slate-300 py-11 px-11 m-1'>My NFTs</span>
+          <Router>
+            <Routes>
+              <Route path="/" element={<UserClassList blockchain={blockchain} />} />
+              <Route path="/class/all" element={<ClassList blockchain={blockchain} />} />
+              <Route
+                path="/class/:classId"
+                element={<ClassDetail blockchain={blockchain} />}
+              />
+              
+            </Routes>
+          </Router>
+          {/* <span className='border-solid border-black bg-slate-300 py-11 px-11 m-1'>My Completed Classes</span>
+          <span className='border-solid border-black bg-slate-300 py-11 px-11 m-1'>My NFTs</span> */}
         </section>
+        
 
       <footer className='bg-gray-600 fixed bottom-0 left-0 w-full flex justify-center items-center text-gray-50 py-8'>FOOTER</footer>
       </body>
