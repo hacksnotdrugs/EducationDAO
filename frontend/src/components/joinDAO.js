@@ -12,9 +12,9 @@ const JoinDAO = ({ blockchain }) => {
 
     useEffect(() => {
         (async () => {
-          blockchain.daoContract && setIsMember(isUserAMember(blockchain, MEMBER_ROLE, blockchain.signerAddress)); // && setNextProposalId(await blockchain.daoContract.nextProposalId());
+          blockchain.daoContract && setIsMember(await isUserAMember(blockchain, MEMBER_ROLE, blockchain.signerAddress)); // && setNextProposalId(await blockchain.daoContract.nextProposalId());
         })();
-      }, [isMember]);
+      }, [blockchain, isMember]);
 
     const joinDAO = async (e) => {
         e.preventDefault();
@@ -32,7 +32,7 @@ const JoinDAO = ({ blockchain }) => {
     return (
         <Container>
        { isMember ? "Welcome back!" 
-       : <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinDAO(e)}>Join the DAO!</Button>
+       : <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinDAO}>Join the DAO!</Button>
         }
         </Container>
     );

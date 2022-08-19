@@ -29,7 +29,7 @@ const getBlockchain = () =>
 
   const isUserAMember = async (blockchain, role, signerAddress) => {
       
-    const kROLE = ethers.utils.keccak256(role);
+    const kROLE = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(role));
     let isMember = await blockchain.daoContract.hasRole(kROLE, signerAddress);
     return isMember;
   }

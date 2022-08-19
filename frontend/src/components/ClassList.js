@@ -14,9 +14,11 @@ const ClassList = ({ blockchain, signer }) => {
   const [classes, setClasses] = useState([]);
   const [nextProposalId, setNextProposalId] = useState(999);
   const [className, setClassName] = useState("Test1");
+  const [classInst, setClassInst] = useState("0x0");
   const [minNumOfStudents, setMinNumOfStudents] = useState(1);
   const [maxNumOfStudents, setMaxNumOfStudents] = useState(2);
   const [classPrice, setClassPrice] = useState(1000);
+  const [isMemberEnrolled, setIsMemberEnrolled] = useState(false);
 
 
   const joinClass = async (e, _classId, _classPrice) => {
@@ -25,6 +27,43 @@ const ClassList = ({ blockchain, signer }) => {
     try {
      await blockchain.daoContract.joinClass(_classId, {value: _classPrice});
       console.log("inside createclass");
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const startClass = async (e, _classId) => {
+    e.preventDefault();
+    
+    try {
+     let tx = await blockchain.daoContract.startClass(_classId);
+     
+     await getClassList();
+      
+    } catch (error) {
+      console.log(error);
+      console.log(error);
+    }
+  };
+
+  const endClass = async (e, _classId) => {
+    e.preventDefault();
+    
+    try {
+     await blockchain.daoContract.endClass(_classId);
+      
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const rateClass = async (e, _classId) => {
+    e.preventDefault();
+    
+    try {
+     await blockchain.daoContract.startClass(_classId);
+      
       
     } catch (error) {
       console.log(error);
@@ -42,13 +81,13 @@ const ClassList = ({ blockchain, signer }) => {
       console.log(error);
     }
   };
-  const isMemberEnrolledInClass = async ( _classId, member) => {
+  const isMemberEnrolledInClass = async ( _classId) => {
     console.log("inside isMemberEnrolled");
     let response = false;
     
     try {
-     response =  await blockchain.daoContract.isMemberEnrolledInClass(_classId, member);
-      
+     response =  await blockchain.daoContract.isMemberEnrolledInClass(window.ethereum.selectedAddress, _classId);
+     console.log("isMemberEnrolled: " + response);
       
     } catch (error) {
       console.log(error);
@@ -60,7 +99,7 @@ const ClassList = ({ blockchain, signer }) => {
     try {
       //await blockchain.daoContract.createClass("Class 1", blockchain.signerAddress, ethers.BigNumber.from("1"), ethers.BigNumber.from("2"), ethers.utils.parseEther("0.01"));
       console.log("cName: "+className + " - add: " + blockchain.signerAddress + " - min: " + minNumOfStudents + " - max: " + maxNumOfStudents + " - price: " + classPrice);
-      await blockchain.daoContract.createClass(className, blockchain.signerAddress, minNumOfStudents, maxNumOfStudents, classPrice);
+      await blockchain.daoContract.createClass(className, classInst, minNumOfStudents, maxNumOfStudents, classPrice);
       console.log("inside createclass");
       
     } catch (error) {
@@ -68,9 +107,19 @@ const ClassList = ({ blockchain, signer }) => {
     }
   };
 
+  const getClassList = async (e) => {
+    try
+    {
+      setClasses(await blockchain.daoContract.getAllClasses());
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     (async () => {
-      blockchain.daoContract && setClasses(await blockchain.daoContract.getAllClasses());
+      blockchain.daoContract && await getClassList();
     })();
   }, [blockchain]);
 
@@ -114,13 +163,30 @@ const ClassList = ({ blockchain, signer }) => {
                           </Link>
                       </td>
                       <td>
-                          <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinClass(e, theClass.id, theClass.price)}>Join</Button>
-                      </td>
+                      {  (window.ethereum.selectedAddress == theClass.instructor.toLowerCase()) 
+                          ? ( 
+                              theClass.started == false 
+                              ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => startClass(e, theClass.id)}>Start Class</Button> 
+                              : (theClass.started == true && theClass.ended == false) 
+                                ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => endClass(e, theClass.id)}>End Class</Button>
+                                : (theClass.ended == true) ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => startClass(e, theClass.id)}>Get Paid</Button> : "" 
+                            )
+                          : 
+                            (
+                              (isMemberEnrolledInClass(theClass.id, window.ethereum.selectedAddress) == true) 
+                                ? (theClass.started == false)
+                                  ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => withdrawFromClass(e, theClass.id)}>Withdraw</Button>  
+                                    : (theClass.started == true && theClass.ended == false)
+                                      ? "Class in progress"
+                                      : (theClass.ended == true) ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => rateClass(e, theClass.id)}>Rate Class</Button>
+                                  : ""
+                                : <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinClass(e, theClass.id, theClass.price)}>Join</Button>
+
+                            )
+                      }
+                      </td> 
                         <td>
-                        {  (window.ethereum.selectedAddress == theClass.instructor.toLowerCase()) ?
-                          <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinClass(e, theClass.id, theClass.price)}>Start Class</Button>
-                          : "" 
-                          }
+                        
                         </td> 
                     </tr>
                 ))}
@@ -139,6 +205,13 @@ const ClassList = ({ blockchain, signer }) => {
                     type="text"
                     placeholder="Enter name"
                     onChange={(e) => setClassName(e.target.value)}
+                    required
+                  />
+                  <Form.Label>Address: </Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter name"
+                    onChange= {(e) => setClassInst(e.target.value)}
                     required
                   />
                 </Form.Group>
