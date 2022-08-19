@@ -31,6 +31,30 @@ const ClassList = ({ blockchain, signer }) => {
     }
   };
 
+  const startClass = async (e, _classId) => {
+    e.preventDefault();
+    console.log("STARTCLASS");
+    try {
+     await blockchain.daoContract.startClass(_classId);
+      console.log("inside startclass");
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const endClass = async (e, _classId) => {
+    e.preventDefault();
+    console.log("ENDCLASS");
+    try {
+     await blockchain.daoContract.endClass(_classId);
+      console.log("inside endclass");
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const withdrawFromClass = async (e, _classId) => {
     e.preventDefault();
     console.log("WITHDRAWCLASS");
@@ -92,6 +116,7 @@ const ClassList = ({ blockchain, signer }) => {
                     <th>Link</th>
                     <th></th>
                     <th>Start</th>
+                    <th>End</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -117,10 +142,18 @@ const ClassList = ({ blockchain, signer }) => {
                           <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinClass(e, theClass.id, theClass.price)}>Join</Button>
                       </td>
                         <td>
-                        {  (window.ethereum.selectedAddress == theClass.instructor.toLowerCase()) ?
-                          <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinClass(e, theClass.id, theClass.price)}>Start Class</Button>
+                        {  
+                          (window.ethereum.selectedAddress == theClass.instructor.toLowerCase()) ?
+                          <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => startClass(e, theClass.id)}>Start Class</Button>
                           : "" 
-                          }
+                        }
+                        </td> 
+                        <td>
+                        {  
+                          (window.ethereum.selectedAddress == theClass.instructor.toLowerCase()) ?
+                          <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => endClass(e, theClass.id)}>End Class</Button>
+                          : "" 
+                        }
                         </td> 
                     </tr>
                 ))}
