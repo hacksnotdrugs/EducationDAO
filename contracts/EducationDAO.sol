@@ -176,6 +176,7 @@ contract EducationDAO is AccessControl  {
         // Check that class has not ended
         require(c.ended == false, "This class has already ended" );
         c.ended = true;
+        c.started = false;
     }
 
     

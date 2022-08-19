@@ -141,6 +141,7 @@ const ClassList = ({ blockchain, signer }) => {
                     <th>Link</th>
                     <th></th>
                     <th>Start</th>
+                    <th>End</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -163,22 +164,22 @@ const ClassList = ({ blockchain, signer }) => {
                           </Link>
                       </td>
                       <td>
-                      {  (window.ethereum.selectedAddress == theClass.instructor.toLowerCase()) 
+                      {  (window.ethereum.selectedAddress === theClass.instructor.toLowerCase()) 
                           ? ( 
-                              theClass.started == false 
+                              theClass.started === false 
                               ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => startClass(e, theClass.id)}>Start Class</Button> 
-                              : (theClass.started == true && theClass.ended == false) 
+                              : (theClass.started === true && theClass.ended === false) 
                                 ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => endClass(e, theClass.id)}>End Class</Button>
-                                : (theClass.ended == true) ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => startClass(e, theClass.id)}>Get Paid</Button> : "" 
+                                : (theClass.ended === true) ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => startClass(e, theClass.id)}>Get Paid</Button> : "" 
                             )
                           : 
                             (
-                              (isMemberEnrolledInClass(theClass.id, window.ethereum.selectedAddress) == true) 
-                                ? (theClass.started == false)
+                              (isMemberEnrolledInClass(theClass.id, window.ethereum.selectedAddress) === true) 
+                                ? (theClass.started === false)
                                   ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => withdrawFromClass(e, theClass.id)}>Withdraw</Button>  
-                                    : (theClass.started == true && theClass.ended == false)
+                                    : (theClass.started === true && theClass.ended === false)
                                       ? "Class in progress"
-                                      : (theClass.ended == true) ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => rateClass(e, theClass.id)}>Rate Class</Button>
+                                      : (theClass.ended === true) ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => rateClass(e, theClass.id)}>Rate Class</Button>
                                   : ""
                                 : <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinClass(e, theClass.id, theClass.price)}>Join</Button>
 
