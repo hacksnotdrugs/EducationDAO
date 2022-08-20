@@ -13,6 +13,7 @@ import ClassList from "./components/ClassList";
 import ProposalList from "./components/ProposalList";
 import UserClassList from "./components/UserClassList";
 import ClassDetail from "./components/ClassDetail";
+import ProposalDetail from './components/ProposalDetail';
 
 const { chains, provider } = configureChains(
   [chain.localhost, chain.goerli],
@@ -88,6 +89,10 @@ function App() {
               <Route
                 path="/class/:classId"
                 element={<ClassDetail blockchain={blockchain} />}
+              />
+              <Route
+                path="/proposal/:proposalId"
+                element={<ProposalDetail blockchain={blockchain} />}
               />
               
             </Routes>

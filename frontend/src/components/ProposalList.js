@@ -45,6 +45,7 @@ const ClassList = ({ blockchain, signer }) => {
   }
 
   const vote = async (e) => {
+    //TODO
     try {
       console.log("VOTE button clicked!")
     } catch (error) {
@@ -75,8 +76,8 @@ const ClassList = ({ blockchain, signer }) => {
                     <th>Price</th>
                     <th>Link</th>
                     <th>Vote</th>
-                    <th></th>
-                    <th></th>
+                    <th>Voted</th>
+                    <th>Min <br/># Votes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -87,7 +88,7 @@ const ClassList = ({ blockchain, signer }) => {
                       <td>{theProposal.price.toString()}</td>
                       <td>
                           <Link
-                            to={`/class/${theProposal.id}`}
+                            to={`/proposal/${theProposal.id}`}
                             state={{
                               class: {
                                 ...theProposal,
@@ -101,9 +102,12 @@ const ClassList = ({ blockchain, signer }) => {
                       <td>
                         <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => vote(e)}>Vote</Button>
                       </td> 
-                        <td>
-                        
-                        </td> 
+                      <td>
+                      
+                      </td> 
+                      <td>
+                      
+                      </td> 
                     </tr>
                 ))}
                 </tbody>
