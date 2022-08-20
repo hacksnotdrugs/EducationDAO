@@ -10,6 +10,7 @@ import { getBlockchain } from "./utils/common";
 import JoinDAO from "./components/joinDAO";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ClassList from "./components/ClassList";
+import ProposalList from "./components/ProposalList";
 import UserClassList from "./components/UserClassList";
 import ClassDetail from "./components/ClassDetail";
 
@@ -33,7 +34,7 @@ function App() {
 
   
   const [blockchain, setBlockchain] = useState({});
-
+  console.log("blockchain object before: ", blockchain)
 
   useEffect(() => {
     (async () => {
@@ -57,7 +58,7 @@ function App() {
             <ul className='inline-flex gap-24'>
               <li><a href="/">Home</a></li>
               <li><a href="/class/all">Classes</a></li>
-              <li>Create</li>
+              <li><a href="/proposal/all">Proposals</a></li>
               <li>NFTs (Coming Soon!)</li>
             </ul>
           </span>
@@ -83,6 +84,7 @@ function App() {
             <Routes>
               <Route path="/" element={<UserClassList blockchain={blockchain} />} />
               <Route path="/class/all" element={<ClassList blockchain={blockchain} />} />
+              <Route path="/proposal/all" element={<ProposalList blockchain={blockchain} />} />
               <Route
                 path="/class/:classId"
                 element={<ClassDetail blockchain={blockchain} />}

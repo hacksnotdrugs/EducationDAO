@@ -18,7 +18,7 @@ const getBlockchain = () =>
           ContractAbi.abi,
           signer
         );
-            //console.log(daoContract);
+            console.log(daoContract);
         resolve({ signerAddress, daoContract });
       }
       resolve({ signerAddress: undefined, daoContract: undefined });
