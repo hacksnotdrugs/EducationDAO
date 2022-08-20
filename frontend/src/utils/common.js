@@ -11,21 +11,24 @@ const getBlockchain = () =>
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const signerAddress = await signer.getAddress();
-        
 
         const daoContract = new ethers.Contract(
           ContractAddress.DAO,
           ContractAbi.abi,
           signer
         );
-            console.log(daoContract);
-        resolve({ signerAddress, daoContract });
+
+        const listenerForContract = new ethers.Contract(
+          ContractAddress.DAO,
+          ContractAbi.abi,
+          provider
+        )
+            console.log(listenerForContract);
+        resolve({ signerAddress, daoContract, listenerForContract });
       }
-      resolve({ signerAddress: undefined, daoContract: undefined });
+      resolve({ signerAddress: undefined, daoContract: undefined, listenerForContract: undefined });
     });
   });
-
-  
 
   const isUserAMember = async (blockchain, role, signerAddress) => {
       

@@ -37,16 +37,35 @@ function App() {
   const [blockchain, setBlockchain] = useState({});
   console.log("blockchain object before: ", blockchain)
 
+  try {
+    
+  blockchain.listenerForContract.on("NewProposalCreated", (
+    proposalId,
+    creatorAddress,
+    minVotesRequired,
+    voteCount
+    ) => {
+      console.log("blockchain event listener 'on'");
+      let info = {
+        proposalId: proposalId,
+        creatorAddress: creatorAddress,
+        minVotesRequired: minVotesRequired,
+        voteCount: voteCount
+      }
+      console.log(info)
+    })
+  } catch (error) {
+    console.log(error)
+  }
+      
   useEffect(() => {
     (async () => {
       setBlockchain(await getBlockchain()); // && setNextProposalId(await blockchain.daoContract.nextProposalId());
     })();
   }, []);
     
-
   return (
     <div className="App flex flex-col">
-      <body>
         
       <header className="App-header w-full">
         {/* Navigation */}
@@ -103,7 +122,6 @@ function App() {
         
 
       <footer className='text-2xl font-semibold bg-gray-600 fixed bottom-0 left-0 w-full flex justify-center items-center text-gray-50 py-8'>EducationDAO</footer>
-      </body>
     </div>
   );
 }
