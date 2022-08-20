@@ -78,6 +78,20 @@ contract EducationDAO is AccessControl  {
     uint256 public nextProposalId;
     uint public voteTime;
 
+    // EVENTS
+
+    event NewProposalCreated(
+        uint256 proposalId,
+        address creatorAddress,
+        uint256 minVotesRequired,
+        uint256 voteCount
+    );
+
+    // event NewClassCreated(
+    // bytes32 classID,
+    // uint256 InstructorId,
+    // uint256 maxCapacity
+    // );
 
     constructor(uint256 _memberFee){
         owner = msg.sender;
@@ -117,6 +131,14 @@ contract EducationDAO is AccessControl  {
             _maxNumberOfStudents,
             false
         );
+
+        emit NewProposalCreated(
+            nextProposalId,
+            msg.sender,
+            _minNumberOfStudents,
+            voteCount
+        );
+
         nextProposalId++;
     }
     //Vote on a proposal
