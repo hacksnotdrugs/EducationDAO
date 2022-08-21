@@ -19,85 +19,87 @@ const ProposalList = ({ blockchain, signer }) => {
   const [maxNumOfStudents, setMaxNumOfStudents] = useState(2);
   const [classPrice, setClassPrice] = useState(1000);
   const [isMemberEnrolled, setIsMemberEnrolled] = useState(false);
-  const [proposalEventObject, setProposalEventObject] = useState();
-  const [voteEventObject, setVoteEventObject] = useState();
+  const [proposalEventObject, setProposalEventObject] = useState([]);
+  const [voteEventObject, setVoteEventObject] = useState([]);
   const [classEventObject, setClassEventObject] = useState();
 
 
-  // Listen for NewProposalCreated Event!
-  try {
+  // // Listen for NewProposalCreated Event!
+  // try {
     
-    blockchain.listenerForContract.on("NewProposalCreated", (
-      proposalId,
-      creatorAddress,
-      minVotesRequired
-    ) => {
-      console.log("PROPOSAL event listener 'on'");
-      let info = {
-        proposalId: proposalId,
-        creatorAddress: creatorAddress,
-        minVotesRequired: minVotesRequired
-      }
-      setProposalEventObject(info);
-      console.log("New eventObject saved:")
-      console.log("From proposalId: ", proposalEventObject.proposalId.toNumber())
-      console.log("From creatorAddress: ", proposalEventObject.creatorAddress)
-      console.log("From minVotesRequired: ", proposalEventObject.minVotesRequired.toNumber())
-    })
-  } catch (error) {
-    console.log(error)
-  }
+  //   blockchain.listenerForContract.on("NewProposalCreated", (
+  //     proposalId,
+  //     creatorAddress,
+  //     minVotesRequired
+  //   ) => {
+  //     console.log("PROPOSAL event listener 'on'");
+  //     let previous = proposalEventObject
+  //     let info = {
+  //       proposalId: proposalId,
+  //       creatorAddress: creatorAddress,
+  //       minVotesRequired: minVotesRequired
+  //     }
+  //     setProposalEventObject([...previous, info]);
+  //     console.log("New eventObject saved:")
+  //     console.log("From proposalId: ", proposalEventObject.proposalId.toNumber())
+  //     console.log("From creatorAddress: ", proposalEventObject.creatorAddress)
+  //     console.log("From minVotesRequired: ", proposalEventObject.minVotesRequired.toNumber())
+  //   })
+  // } catch (error) {
+  //   console.log(error)
+  // }
 
-  // Listen for NewVoteCount Event!
-  try {
+  // // Listen for NewVoteCount Event!
+  // try {
     
-    blockchain.listenerForContract.on("NewVoteCount", (
-      proposalId,
-      voterAddress,
-      voteCount
-    ) => {
-      console.log("VOTE event listener 'on'");
-      let info = {
-        proposalId: proposalId,
-        voterAddress: voterAddress,
-        voteCount: voteCount
-      }
-      setVoteEventObject(info);
-      console.log("New VOTE saved:")
-      console.log("From proposalId: ", voteEventObject.proposalId.toNumber())
-      console.log("From voterAddress: ", voteEventObject.voterAddress)
-      console.log("From voteCount: ", voteEventObject.voteCount.toNumber())
-    })
-  } catch (error) {
-    console.log(error)
-  }
+  //   blockchain.listenerForContract.on("NewVoteCount", (
+  //     proposalId,
+  //     voterAddress,
+  //     voteCount
+  //   ) => {
+  //     console.log("VOTE event listener 'on'");
+  //     let previous = voteEventObject;
+  //     let info = {
+  //       proposalId: proposalId,
+  //       voterAddress: voterAddress,
+  //       voteCount: voteCount
+  //     }
+  //     setVoteEventObject([...previous, info]);
+  //     console.log("New VOTE saved:")
+  //     console.log("From proposalId: ", voteEventObject.proposalId.toNumber())
+  //     console.log("From voterAddress: ", voteEventObject.voterAddress)
+  //     console.log("From voteCount: ", voteEventObject.voteCount.toNumber())
+  //   })
+  // } catch (error) {
+  //   console.log(error)
+  // }
 
-  // Listen for NewClassCreated Event!
-  try {
+  // // Listen for NewClassCreated Event!
+  // try {
     
-    blockchain.listenerForContract.on("NewClassCreated", (
-      proposalId,
-      instructorAddress,
-      maxStudentCount,
-      minStudentCount
-    ) => {
-      console.log("VOTE event listener 'on'");
-      let info = {
-        proposalId: proposalId,
-        instructorAddress: instructorAddress,
-        maxStudentCount: maxStudentCount,
-        minStudentCount: minStudentCount 
-      }
-      setClassEventObject(info);
-      console.log("New CLASS saved:")
-      console.log("From proposalId: ", classEventObject.proposalId.toNumber())
-      console.log("From instructorAddress: ", classEventObject.instructorAddress)
-      console.log("From maxStudentCount: ", classEventObject.maxStudentCount.toNumber())
-      console.log("From minStudentCount: ", classEventObject.minStudentCount.toNumber())
-    })
-  } catch (error) {
-    console.log(error)
-  }
+  //   blockchain.listenerForContract.on("NewClassCreated", (
+  //     proposalId,
+  //     instructorAddress,
+  //     maxStudentCount,
+  //     minStudentCount
+  //   ) => {
+  //     console.log("VOTE event listener 'on'");
+  //     let info = {
+  //       proposalId: proposalId,
+  //       instructorAddress: instructorAddress,
+  //       maxStudentCount: maxStudentCount,
+  //       minStudentCount: minStudentCount 
+  //     }
+  //     setClassEventObject(info);
+  //     console.log("New CLASS saved:")
+  //     console.log("From proposalId: ", classEventObject.proposalId.toNumber())
+  //     console.log("From instructorAddress: ", classEventObject.instructorAddress)
+  //     console.log("From maxStudentCount: ", classEventObject.maxStudentCount.toNumber())
+  //     console.log("From minStudentCount: ", classEventObject.minStudentCount.toNumber())
+  //   })
+  // } catch (error) {
+  //   console.log(error)
+  // }
 
   const createProposal = async (e) => {
     e.preventDefault();
@@ -180,12 +182,12 @@ const ProposalList = ({ blockchain, signer }) => {
                       <td>
                         <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={ (e) => vote(e, theProposal.id)}>Vote</Button>
                       </td> 
-                      <td>
+                      {/* <td>
                         {voteEventObject && voteEventObject.voteCount.toNumber()}
                       </td> 
                       <td>
-                        {proposalEventObject && proposalEventObject.minVotesRequired.toNumber()} 
-                      </td> 
+                        {proposalEventObject && proposalEventObject[theProposal.id].minVotesRequired.toNumber()} 
+                      </td>  */}
                     </tr>
                 ))}
                 </tbody>

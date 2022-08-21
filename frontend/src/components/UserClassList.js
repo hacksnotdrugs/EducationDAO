@@ -36,8 +36,13 @@ const UserClassList = ({ blockchain, signer }) => {
 
   useEffect(() => {
     (async () => {
-      blockchain.daoContract && setUserClasses(await blockchain.daoContract.getClassesForStudent(blockchain.signerAddress));
-      
+      try {
+        blockchain.daoContract.getClassesForStudent(blockchain.signerAddress);
+        console.log("from UserClassList.js useEffect")        
+        console.log(blockchain.signerAddress)
+      } catch (error) {
+        console.log(error)
+      }
     })();
   }, [blockchain]);
 
@@ -45,7 +50,7 @@ const UserClassList = ({ blockchain, signer }) => {
 
   return (
     <Container>
-      {userClasses.length > 0 ? (
+      {userClasses.length ? (
         <div className="row">
         <div className="col-sm-4 first-col">
           <Col>
