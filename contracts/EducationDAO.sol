@@ -83,15 +83,21 @@ contract EducationDAO is AccessControl  {
     event NewProposalCreated(
         uint256 proposalId,
         address creatorAddress,
-        uint256 minVotesRequired,
-        uint256 voteCount
+        uint256 minVotesRequired
     );
 
-    // event NewClassCreated(
-    // bytes32 classID,
-    // uint256 InstructorId,
-    // uint256 maxCapacity
-    // );
+    event NewVoteCount(
+        uint256 proposalId,
+        address voterAddress,
+        uint256 voteCount 
+    );
+
+    event NewClassCreated(
+        uint256 classID,
+        address InstructorId,
+        uint256 maxCapacity,
+        uint minStudentsRequired
+    );
 
     constructor(uint256 _memberFee){
         owner = msg.sender;
@@ -135,8 +141,7 @@ contract EducationDAO is AccessControl  {
         emit NewProposalCreated(
             nextProposalId,
             msg.sender,
-            _minNumberOfStudents,
-            voteCount
+            _minNumberOfStudents
         );
 
         nextProposalId++;
@@ -148,6 +153,11 @@ contract EducationDAO is AccessControl  {
 		require(block.timestamp < proposal.end, "Voting period has ended");
 		whoVoted[msg.sender][proposalId] = true;
         proposal.voteCount+=1;
+        emit NewVoteCount(
+            proposalId,
+            msg.sender,
+            proposal.voteCount 
+        );
         if (proposal.voteCount == proposal.minimumVotes){
             createClass(proposal.name, payable(proposal.instructor), proposal.minimumVotes, proposal.maxNumberOfStudents, proposal.price);
         }
@@ -172,6 +182,13 @@ contract EducationDAO is AccessControl  {
             numberOfReviews: 0
         });
         classCount = nextClassId;
+
+        emit NewClassCreated(
+            nextClassId,
+            _instructor,
+            _maxNumberOfStudents,
+            _minNumberOfStudents
+        );
     }
 
     // Start class -> Only the instructor should be able to start the class. How do we know the instructor's address?

@@ -14,6 +14,7 @@ import ProposalList from "./components/ProposalList";
 import UserClassList from "./components/UserClassList";
 import ClassDetail from "./components/ClassDetail";
 import ProposalDetail from './components/ProposalDetail';
+import { ethers } from 'ethers';
 
 const { chains, provider } = configureChains(
   [chain.localhost, chain.goerli],
@@ -36,27 +37,6 @@ function App() {
   
   const [blockchain, setBlockchain] = useState({});
   console.log("blockchain object before: ", blockchain)
-
-  try {
-    
-  blockchain.listenerForContract.on("NewProposalCreated", (
-    proposalId,
-    creatorAddress,
-    minVotesRequired,
-    voteCount
-    ) => {
-      console.log("blockchain event listener 'on'");
-      let info = {
-        proposalId: proposalId,
-        creatorAddress: creatorAddress,
-        minVotesRequired: minVotesRequired,
-        voteCount: voteCount
-      }
-      console.log(info)
-    })
-  } catch (error) {
-    console.log(error)
-  }
       
   useEffect(() => {
     (async () => {

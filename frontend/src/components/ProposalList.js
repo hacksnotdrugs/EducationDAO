@@ -8,9 +8,9 @@ import { Link, useParams } from "react-router-dom";
 import { ethers } from "ethers";
 import Form from "react-bootstrap/Form";
 
-const ClassList = ({ blockchain, signer }) => {
+const ProposalList = ({ blockchain, signer }) => {
   
-  // State to store auctions
+  // State variables
   const [proposals, setProposals] = useState([]);
   const [nextProposalId, setNextProposalId] = useState(999);
   const [proposalName, setProposalName] = useState("Test1");
@@ -19,8 +19,85 @@ const ClassList = ({ blockchain, signer }) => {
   const [maxNumOfStudents, setMaxNumOfStudents] = useState(2);
   const [classPrice, setClassPrice] = useState(1000);
   const [isMemberEnrolled, setIsMemberEnrolled] = useState(false);
+  const [proposalEventObject, setProposalEventObject] = useState();
+  const [voteEventObject, setVoteEventObject] = useState();
+  const [classEventObject, setClassEventObject] = useState();
 
 
+  // Listen for NewProposalCreated Event!
+  try {
+    
+    blockchain.listenerForContract.on("NewProposalCreated", (
+      proposalId,
+      creatorAddress,
+      minVotesRequired
+    ) => {
+      console.log("PROPOSAL event listener 'on'");
+      let info = {
+        proposalId: proposalId,
+        creatorAddress: creatorAddress,
+        minVotesRequired: minVotesRequired
+      }
+      setProposalEventObject(info);
+      console.log("New eventObject saved:")
+      console.log("From proposalId: ", proposalEventObject.proposalId.toNumber())
+      console.log("From creatorAddress: ", proposalEventObject.creatorAddress)
+      console.log("From minVotesRequired: ", proposalEventObject.minVotesRequired.toNumber())
+    })
+  } catch (error) {
+    console.log(error)
+  }
+
+  // Listen for NewVoteCount Event!
+  try {
+    
+    blockchain.listenerForContract.on("NewVoteCount", (
+      proposalId,
+      voterAddress,
+      voteCount
+    ) => {
+      console.log("VOTE event listener 'on'");
+      let info = {
+        proposalId: proposalId,
+        voterAddress: voterAddress,
+        voteCount: voteCount
+      }
+      setVoteEventObject(info);
+      console.log("New VOTE saved:")
+      console.log("From proposalId: ", voteEventObject.proposalId.toNumber())
+      console.log("From voterAddress: ", voteEventObject.voterAddress)
+      console.log("From voteCount: ", voteEventObject.voteCount.toNumber())
+    })
+  } catch (error) {
+    console.log(error)
+  }
+
+  // Listen for NewClassCreated Event!
+  try {
+    
+    blockchain.listenerForContract.on("NewClassCreated", (
+      proposalId,
+      instructorAddress,
+      maxStudentCount,
+      minStudentCount
+    ) => {
+      console.log("VOTE event listener 'on'");
+      let info = {
+        proposalId: proposalId,
+        instructorAddress: instructorAddress,
+        maxStudentCount: maxStudentCount,
+        minStudentCount: minStudentCount 
+      }
+      setClassEventObject(info);
+      console.log("New CLASS saved:")
+      console.log("From proposalId: ", classEventObject.proposalId.toNumber())
+      console.log("From instructorAddress: ", classEventObject.instructorAddress)
+      console.log("From maxStudentCount: ", classEventObject.maxStudentCount.toNumber())
+      console.log("From minStudentCount: ", classEventObject.minStudentCount.toNumber())
+    })
+  } catch (error) {
+    console.log(error)
+  }
 
   const createProposal = async (e) => {
     e.preventDefault();
@@ -44,10 +121,11 @@ const ClassList = ({ blockchain, signer }) => {
     }
   }
 
-  const vote = async (e) => {
+  const vote = async (e, proposalId) => {
     //TODO
     try {
-      console.log("VOTE button clicked!")
+      console.log(`VOTE button clicked for proposal # ${proposalId}!`);
+      await blockchain.daoContract.vote(proposalId);
     } catch (error) {
       console.log(error);
     }
@@ -100,13 +178,13 @@ const ClassList = ({ blockchain, signer }) => {
                           </Link>
                       </td>
                       <td>
-                        <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => vote(e)}>Vote</Button>
+                        <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={ (e) => vote(e, theProposal.id)}>Vote</Button>
                       </td> 
                       <td>
-                      
+                        {voteEventObject && voteEventObject.voteCount.toNumber()}
                       </td> 
                       <td>
-                      
+                        {proposalEventObject && proposalEventObject.minVotesRequired.toNumber()} 
                       </td> 
                     </tr>
                 ))}
@@ -150,4 +228,4 @@ const ClassList = ({ blockchain, signer }) => {
   );
 };
 
-export default ClassList;
+export default ProposalList;
