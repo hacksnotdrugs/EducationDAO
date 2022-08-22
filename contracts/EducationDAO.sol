@@ -163,9 +163,8 @@ contract EducationDAO is AccessControl  {
         }
 	}
 
-    // TODO
-    // I made this public for testing purposes. But it should be internal
-    function createClass(string memory className, address payable _instructor, uint256 _minNumberOfStudents, uint256 _maxNumberOfStudents, uint256 _price) public {
+  
+    function createClass(string memory className, address payable _instructor, uint256 _minNumberOfStudents, uint256 _maxNumberOfStudents, uint256 _price) internal {
         
         uint256 nextClassId = classCount+1;
         classes[nextClassId] = Class ({
