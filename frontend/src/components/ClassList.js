@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from "react";
+import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { Link, useParams } from "react-router-dom";
-import { ethers } from "ethers";
-import Form from "react-bootstrap/Form";
+import Table from "react-bootstrap/Table";
 
 const ClassList = ({ blockchain, signer }) => {
   
   // State to store auctions
   const [classes, setClasses] = useState([]);
-  const [nextProposalId, setNextProposalId] = useState(999);
-  const [className, setClassName] = useState("Test1");
+
+  const [className, setClassName] = useState("");
   const [classInst, setClassInst] = useState("0x0");
   const [minNumOfStudents, setMinNumOfStudents] = useState(1);
   const [maxNumOfStudents, setMaxNumOfStudents] = useState(2);
   const [classPrice, setClassPrice] = useState(1000);
-  const [isMemberEnrolled, setIsMemberEnrolled] = useState(false);
+
 
 
   const joinClass = async (e, _classId, _classPrice) => {
@@ -26,9 +24,12 @@ const ClassList = ({ blockchain, signer }) => {
     console.log("JOINCLASS");
     try {
      await blockchain.daoContract.joinClass(_classId, {value: _classPrice});
-      console.log("inside createclass");
+      
       
     } catch (error) {
+      // let betterError = error.split("(reason=");
+      // let msg = betterError[1];
+      alert(error.code);
       console.log(error);
     }
   };
@@ -98,9 +99,9 @@ const ClassList = ({ blockchain, signer }) => {
     e.preventDefault();
     try {
       //await blockchain.daoContract.createClass("Class 1", blockchain.signerAddress, ethers.BigNumber.from("1"), ethers.BigNumber.from("2"), ethers.utils.parseEther("0.01"));
-      console.log("cName: "+className + " - add: " + blockchain.signerAddress + " - min: " + minNumOfStudents + " - max: " + maxNumOfStudents + " - price: " + classPrice);
+      //console.log("cName: "+className + " - add: " + blockchain.signerAddress + " - min: " + minNumOfStudents + " - max: " + maxNumOfStudents + " - price: " + classPrice);
       await blockchain.daoContract.createClass(className, classInst, minNumOfStudents, maxNumOfStudents, classPrice);
-      console.log("inside createclass");
+      //console.log("inside createclass");
       
     } catch (error) {
       console.log(error);
@@ -126,22 +127,20 @@ const ClassList = ({ blockchain, signer }) => {
 
 
   return (
-    <Container>
-      <div className="row">
-        <div className="col-sm-4 first-col">
+    <Container centered>
+      <div >
+        <div >
           <Col>
               <h3>All Classes: {classes.length}</h3>
             
-              <table className={`py-4 mt-5 mx-auto table-striped trade-list ${className}`}>
+              <Table striped bordered hover centered>
                 <thead>
                   <tr>
                     <th>Name</th>
                     <th>Instructor</th>
                     <th>Price</th>
-                    <th>Link</th>
-                    <th></th>
-                    <th>Start</th>
-                    <th>End</th>
+                    <th>Details</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -186,16 +185,14 @@ const ClassList = ({ blockchain, signer }) => {
                             )
                       }
                       </td> 
-                        <td>
                         
-                        </td> 
                     </tr>
                 ))}
                 </tbody>
-              </table>
+              </Table>
             </Col>
         </div>
-        <div className="col-sm-4 mb-5">
+        {/* <div className="col-sm-4 mb-5">
           <Col>
             <Form className="form" onSubmit={createClass}>
               <Row>
@@ -225,7 +222,7 @@ const ClassList = ({ blockchain, signer }) => {
               </Row>
             </Form>
           </Col>
-        </div>
+        </div> */}
       </div>
     </Container>
   );

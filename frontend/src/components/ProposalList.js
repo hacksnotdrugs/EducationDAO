@@ -7,6 +7,8 @@ import Button from "react-bootstrap/Button";
 import { Link, useParams } from "react-router-dom";
 import { ethers } from "ethers";
 import Form from "react-bootstrap/Form";
+import CreateProposal from "./CreateProposal";
+import Table from "react-bootstrap/Table";
 
 const ProposalList = ({ blockchain, signer }) => {
   
@@ -101,17 +103,7 @@ const ProposalList = ({ blockchain, signer }) => {
   //   console.log(error)
   // }
 
-  const createProposal = async (e) => {
-    e.preventDefault();
-    try {
-      console.log("pName: "+proposalName + " - add: " + blockchain.signerAddress + " - min: " + minNumOfStudents + " - max: " + maxNumOfStudents + " - price: " + classPrice);
-      await blockchain.daoContract.createProposal(proposalName, proposalInst, classPrice, minNumOfStudents, maxNumOfStudents);
-      console.log("inside createproposal");
-      
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
 
   const getProposalList = async (e) => {
     try
@@ -137,18 +129,18 @@ const ProposalList = ({ blockchain, signer }) => {
     (async () => {
       blockchain.daoContract && await getProposalList();
     })();
-  }, [blockchain]);
+  }, [blockchain, proposals]);
 
 
 
   return (
-    <Container>
-      <div className="row">
-        <div className="col-sm-4 first-col">
+    <Container centered>
+      <div>
+        <div>
           <Col>
               <h3>All proposals: {proposals.length}</h3>
             
-              <table className={`py-4 mt-5 mx-auto table-striped trade-list ${proposalName}`}>
+              <Table striped bordered hover centered>
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -157,7 +149,8 @@ const ProposalList = ({ blockchain, signer }) => {
                     <th>Link</th>
                     <th>Vote</th>
                     <th>Voted</th>
-                    <th>Min <br/># Votes</th>
+                    <th>Min # Votes</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -182,6 +175,9 @@ const ProposalList = ({ blockchain, signer }) => {
                       <td>
                         <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={ (e) => vote(e, theProposal.id)}>Vote</Button>
                       </td> 
+                      <td>{theProposal.voteCount.toString()}</td>
+                      <td>{theProposal.minimumVotes.toString()}</td>
+                      <td>{theProposal.voteCount >= theProposal.minimumVotes ? "Executed": "Open"}</td>
                       {/* <td>
                         {voteEventObject && voteEventObject.voteCount.toNumber()}
                       </td> 
@@ -191,40 +187,13 @@ const ProposalList = ({ blockchain, signer }) => {
                     </tr>
                 ))}
                 </tbody>
-              </table>
+              </Table>
+            </Col>
+            <Col style={{display: 'flex',  justifyContent:'center', alignItems:'center', height: '100vh'}}>
+           
             </Col>
         </div>
-        <div className="col-sm-4 mb-5">
-          <Col>
-            <Form className="form" onSubmit={createProposal}>
-              <Row>
-                <Col>
-                <Form.Group className="mb-2" controlId="name">
-                  <Form.Label>Name: </Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter name"
-                    onChange={(e) => setProposalName(e.target.value)}
-                    required
-                  />
-                  <Form.Label>Address: </Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter name"
-                    onChange= {(e) => setProposalInst(e.target.value)}
-                    required
-                  />
-                </Form.Group>
-                </Col>
-                <Col className="mb-5">
-                  <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" type="submit">
-                    Submit
-                  </Button>
-                </Col>
-              </Row>
-            </Form>
-          </Col>
-        </div>
+        
       </div>
     </Container>
   );

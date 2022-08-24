@@ -1,4 +1,5 @@
 import './App.css';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
@@ -9,12 +10,17 @@ import { publicProvider } from "wagmi/providers/public";
 import { getBlockchain } from "./utils/common";
 import JoinDAO from "./components/joinDAO";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ClassList from "./components/ClassList";
 import ProposalList from "./components/ProposalList";
 import UserClassList from "./components/UserClassList";
 import ClassDetail from "./components/ClassDetail";
 import ProposalDetail from './components/ProposalDetail';
+import CreateProposal from "./components/CreateProposal";
 import { ethers } from 'ethers';
+import ButtonToolbar from 'react-bootstrap/esm/ButtonToolbar';
+import Button from 'react-bootstrap/esm/Button';
+import Container from 'react-bootstrap/esm/Container';
 
 const { chains, provider } = configureChains(
   [chain.localhost, chain.goerli],
@@ -36,13 +42,19 @@ function App() {
 
   
   const [blockchain, setBlockchain] = useState({});
-  console.log("blockchain object before: ", blockchain)
-      
+  
+  
+  
   useEffect(() => {
     (async () => {
       setBlockchain(await getBlockchain()); // && setNextProposalId(await blockchain.daoContract.nextProposalId());
     })();
   }, []);
+
+  const openLink = (e) => {
+    e.preventDefault();
+    window.location = '/class/all';
+  }
     
   return (
     <div className="App flex flex-col">
@@ -71,16 +83,22 @@ function App() {
           </span>
         </nav>
       </header>
-        <main className='bg-slate-200 py-11 mb-7'>
-          <p className='text-gray-800 text-4xl font-bold'>Welcome STUDENT!</p>
+      
+        <main className='bg-slate-200 py-11 mb-7' centered>
+          <h2 className=''>Welcome STUDENT!</h2>
           <p>What would you like to do today?</p>
-          <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1'>Create Class Proposal</button>
-          <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1'>Vote</button>
-          <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1'>Join a Class</button>
+          <div className="justify-content-md-center" centered>
+            <ButtonToolbar className="justify-content-md-center">
+              <CreateProposal blockchain={blockchain} />
+              <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1'>Vote</Button>
+              <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' onClick={(e) => openLink(e)}>Join a Class</Button>
+            </ButtonToolbar>
+          </div>
         </main>
-        <section>
-          <span className='border-solid border-black bg-slate-300 py-11 px-11 m-1'>My Upcoming Classes</span>
-          <Router>
+        
+        <section className='border-solid border-black  py-10 m-1'>
+          
+          <Router centered>
             <Routes>
               <Route path="/" element={<UserClassList blockchain={blockchain} />} />
               <Route path="/class/all" element={<ClassList blockchain={blockchain} />} />
@@ -96,6 +114,7 @@ function App() {
               
             </Routes>
           </Router>
+          
           {/* <span className='border-solid border-black bg-slate-300 py-11 px-11 m-1'>My Completed Classes</span>
           <span className='border-solid border-black bg-slate-300 py-11 px-11 m-1'>My NFTs</span> */}
         </section>
