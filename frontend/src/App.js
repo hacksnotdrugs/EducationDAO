@@ -9,8 +9,7 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { getBlockchain } from "./utils/common";
 import JoinDAO from "./components/joinDAO";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Link, Route, Routes } from "react-router-dom";
 import ClassList from "./components/ClassList";
 import ProposalList from "./components/ProposalList";
 import UserClassList from "./components/UserClassList";
@@ -21,6 +20,8 @@ import { ethers } from 'ethers';
 import ButtonToolbar from 'react-bootstrap/esm/ButtonToolbar';
 import Button from 'react-bootstrap/esm/Button';
 import Container from 'react-bootstrap/esm/Container';
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
 
 const { chains, provider } = configureChains(
   [chain.localhost, chain.goerli],
@@ -61,14 +62,15 @@ function App() {
         
       <header className="App-header w-full">
         {/* Navigation */}
-        <nav className='flex py-6 bg-slate-500 text-slate-50'>
+        {/* <nav className='flex py-6 bg-slate-500 text-slate-50'>
           {/* <span className='flex-1'>LOGO</span> */}
-          <span className='flex-2'>
+          {/* <span className='flex-2'>
            <JoinDAO blockchain={blockchain}/>
           </span>
           <span className='flex-1'>
             <ul className='inline-flex gap-24'>
               <li><a href="/">Home</a></li>
+              
               <li><a href="/class/all">Classes</a></li>
               <li><a href="/proposal/all">Proposals</a></li>
               <li>NFTs (Coming Soon!)</li>
@@ -81,7 +83,29 @@ function App() {
               </RainbowKitProvider>
             </WagmiConfig>
           </span>
-        </nav>
+        </nav> */} 
+
+        <Navbar bg="primary" variant="dark">
+        <Container>
+          <span>
+          <JoinDAO blockchain={blockchain}/>
+          </span>
+          {/* <Navbar.Brand href="#home">EducationDAO</Navbar.Brand> */}
+          <Nav className="me-auto" centered>
+            <Nav.Link href="/">Home</Nav.Link>
+            <Nav.Link href="/class/all">Classes</Nav.Link>
+            <Nav.Link href="/proposal/all">Proposals</Nav.Link>
+            <Nav.Link href="#">NFTs (Coming Soon!)</Nav.Link>
+          </Nav>
+        </Container>
+        <span>
+            <WagmiConfig client={wagmiClient}>
+              <RainbowKitProvider chains={chains}>
+                <YourComponent />
+              </RainbowKitProvider>
+            </WagmiConfig>
+          </span>
+        </Navbar>
       </header>
       
         <main className='bg-slate-200 py-11 mb-7' centered>

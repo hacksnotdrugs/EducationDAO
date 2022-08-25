@@ -145,12 +145,13 @@ const ProposalList = ({ blockchain, signer }) => {
                   <tr>
                     <th>Name</th>
                     <th>Instructor</th>
-                    <th>Price</th>
-                    <th>Link</th>
-                    <th>Vote</th>
+                    <th>Price (ETH)</th>
+                    
                     <th>Voted</th>
                     <th>Min # Votes</th>
                     <th>Status</th>
+                    <th>Link</th>
+                    <th>Vote</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -158,7 +159,11 @@ const ProposalList = ({ blockchain, signer }) => {
                   <tr key={theProposal.id}>
                       <td>{theProposal.name}</td>
                       <td>{theProposal.instructor}</td>
-                      <td>{theProposal.price.toString()}</td>
+                      <td>{ethers.utils.formatEther(theProposal.price.toString())}</td>
+                      
+                      <td>{theProposal.voteCount.toString()}</td>
+                      <td>{theProposal.minimumVotes.toString()}</td>
+                      <td>{theProposal.voteCount >= theProposal.minimumVotes ? "Executed": "Open"}</td>
                       <td>
                           <Link
                             to={`/proposal/${theProposal.id}`}
@@ -173,11 +178,10 @@ const ProposalList = ({ blockchain, signer }) => {
                           </Link>
                       </td>
                       <td>
-                        <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={ (e) => vote(e, theProposal.id)}>Vote</Button>
+                        { theProposal.voteCount >= theProposal.minimumVotes ? <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={ (e) => vote(e, theProposal.id)} disabled>Vote</Button>
+                        : <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={ (e) => vote(e, theProposal.id)}>Vote</Button>
+                        } 
                       </td> 
-                      <td>{theProposal.voteCount.toString()}</td>
-                      <td>{theProposal.minimumVotes.toString()}</td>
-                      <td>{theProposal.voteCount >= theProposal.minimumVotes ? "Executed": "Open"}</td>
                       {/* <td>
                         {voteEventObject && voteEventObject.voteCount.toNumber()}
                       </td> 

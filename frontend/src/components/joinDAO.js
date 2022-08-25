@@ -29,7 +29,7 @@ const JoinDAO = ({ blockchain }) => {
 
     return (
         <Container>
-       { isMember ? "Welcome back!" 
+       { isMember ? <span class="text-light">Welcome back!</span>
        : <Button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-1' variant="primary" onClick={e => joinDAO(e)}>Join the DAO!</Button>
         }
         </Container>
