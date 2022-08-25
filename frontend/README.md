@@ -68,3 +68,25 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## FAQs
+
+1. What is EducationDAO?
+- A place where members can create proposals to arrange classes for ANYTHING, and where instructors can collect 100% of the fees.
+
+2. How do I join?
+- An initial membership fee which will be directed to treasury activities
+
+3. What will the treasury be used for?
+- Membership and networking events
+- To sponsor popularly voted free trainings, decided by the members
+- To pay the community managers who keep the wheels turning for the community!
+
+4. How does the creation of proposals/voting work?
+- Any member (ideally the potential instructor) can create a proposal with class topics and details such as minimum class size, voting period, fees and instructor details. This will cost gas to create.
+- Members can then proceed to vote for their favorite proposals.
+
+5. How does the creation of classes work?
+- If the number of votes matches the minimum class size, a class is automatically created, and voters are enrolled.
+- Other members can also join these classes at their leisure.
+
